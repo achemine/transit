@@ -1,0 +1,524 @@
+<div id="main">
+  <!-- ----------------------------------------------------------
+      LEFT SIDEBAR  (#sidebar)
+      A navigation drawer that slides in from the left.
+
+      We use <nav> (not <div>) because this holds navigation links —
+      <nav> is a semantic tag that is better for accessibility and SEO.
+
+      On MOBILE  → hidden off-screen (CSS slides it in when .open is added).
+      On DESKTOP → permanently visible on the left side.
+    ---------------------------------------------------------- -->
+  <nav id="sidebar" aria-label="Main navigation">
+    <!-- SIDEBAR TOP HEADER — blue background, avatar, close button -->
+    <div id="sidebar-header">
+      <!-- Profile row: avatar circle + name + email -->
+      <div id="sidebar-profile">
+        <!--
+            AVATAR CIRCLE
+            Just a circle with the letter "U" for now.
+            In a real app this would show a user profile photo.
+          -->
+        <div id="avatar">U</div>
+
+        <div>
+          <div id="avatar-name">USTHB Student</div>
+          <div id="avatar-email">maps.app@usthb.dz</div>
+        </div>
+      </div>
+
+      <!-- Close button — visible on mobile to dismiss the sidebar -->
+      <button id="sidebar-close" title="Close menu" aria-label="Close menu">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <!-- end #sidebar-header -->
+
+    <!-- ======================================================
+        SIDEBAR ITEMS
+        Each item follows the same pattern:
+          <div class="sidebar-item" onclick="someFunction()">
+            <div class="sidebar-icon [color-class]"> icon </div>
+            <div class="sidebar-text">
+              <span class="sidebar-title"> Main label </span>
+              <span class="sidebar-sub">  Description </span>
+            </div>
+          </div>
+
+        The colour class on sidebar-icon (e.g. home-icon, work-icon)
+        gives each circle its own background and icon colour.
+      ====================================================== -->
+
+    <!-- Section label — small uppercase grey text acting as a divider -->
+    <div class="sidebar-section-label">Navigation</div>
+
+    <div class="sidebar-item" onclick="goHome()">
+      <div class="sidebar-icon home-icon">
+        <i class="fa-solid fa-house"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Home</span>
+        <span class="sidebar-sub">USTHB, Bab Ezzouar</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" onclick="goWork()">
+      <div class="sidebar-icon work-icon">
+        <i class="fa-solid fa-briefcase"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Work</span>
+        <span class="sidebar-sub">Grande Poste, Algiers</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" onclick="openDirections()">
+      <div class="sidebar-icon route-icon">
+        <i class="fa-solid fa-route"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Directions</span>
+        <span class="sidebar-sub">Get turn-by-turn route</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Places</div>
+
+    <div class="sidebar-item" onclick="showSavedPlaces()">
+      <div class="sidebar-icon saved-icon">
+        <i class="fa-solid fa-star"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Saved places</span>
+        <span class="sidebar-sub">Your bookmarks</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" onclick="showNearby('restaurant')">
+      <div class="sidebar-icon food-icon">
+        <i class="fa-solid fa-utensils"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Restaurants</span>
+        <span class="sidebar-sub">Find food near you</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" onclick="showNearby('hospital')">
+      <div class="sidebar-icon hospital-icon">
+        <i class="fa-solid fa-hospital"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Hospitals</span>
+        <span class="sidebar-sub">Medical centers nearby</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label">Map</div>
+
+    <div class="sidebar-item" onclick="switchLayer()">
+      <div class="sidebar-icon layer-icon">
+        <i class="fa-solid fa-layer-group"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Switch map style</span>
+        <!--
+            This span has an id so JavaScript can update the text.
+            It will change to: "Currently: Satellite" etc.
+          -->
+        <span class="sidebar-sub" id="current-layer-name"
+          >Currently: Default</span
+        >
+      </div>
+    </div>
+
+    <div class="sidebar-item" onclick="shareLocation()">
+      <div class="sidebar-icon share-icon">
+        <i class="fa-solid fa-share-nodes"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Share map link</span>
+        <span class="sidebar-sub">Copy link to clipboard</span>
+      </div>
+    </div>
+
+    <div class="sidebar-item" onclick="printMap()">
+      <div class="sidebar-icon print-icon">
+        <i class="fa-solid fa-print"></i>
+      </div>
+      <div class="sidebar-text">
+        <span class="sidebar-title">Print map</span>
+        <span class="sidebar-sub">Save as PDF or paper</span>
+      </div>
+    </div>
+
+    <!--
+        SIDEBAR FOOTER
+        "margin-top: auto" in CSS pushes this to the very bottom
+        of the sidebar, no matter how few items are above it.
+      -->
+    <div id="sidebar-footer">
+      <span>My Maps App · USTHB Project</span>
+    </div>
+  </nav>
+  <!-- end #sidebar -->
+
+  <!--
+      DARK OVERLAY (mobile only)
+      When the sidebar slides open on a phone, this semi-transparent
+      black layer covers the map behind it.
+      Tapping it calls closeSidebar() — same as the close button.
+
+      Starts hidden (CSS: display:none).
+      JavaScript adds class "visible" to show it.
+    -->
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- ----------------------------------------------------------
+      THE MAP  (#map)
+      This is an empty <div>. Leaflet.js finds it by its id="map"
+      and draws all the map tiles, markers, and controls inside it.
+      NEVER put content inside this div — Leaflet owns it.
+    ---------------------------------------------------------- -->
+  <div id="map" aria-label="Interactive map"></div>
+
+  <!-- ----------------------------------------------------------
+      FLOATING RIGHT CONTROL BUTTONS  (#right-controls)
+      These four buttons float on top of the map, centered vertically
+      on the right edge. They are positioned with CSS "absolute".
+    ---------------------------------------------------------- -->
+  <div id="right-controls">
+    <!--
+        ZOOM IN
+        "onclick=map.zoomIn()" calls Leaflet's built-in zoom method.
+        "map" is the Leaflet map object we will create in app.js.
+      -->
+    <button
+      class="ctrl-btn"
+      onclick="map.zoomIn()"
+      title="Zoom in"
+      aria-label="Zoom in"
+    >
+      <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- ZOOM OUT -->
+    <button
+      class="ctrl-btn"
+      onclick="map.zoomOut()"
+      title="Zoom out"
+      aria-label="Zoom out"
+    >
+      <i class="fa-solid fa-minus"></i>
+    </button>
+
+    <!--
+        VISUAL DIVIDER
+        Just a thin horizontal line between the zoom buttons
+        and the other controls. It is a plain empty <div> styled in CSS.
+      -->
+    <div class="ctrl-divider"></div>
+
+    <!-- COMPASS — resets the map rotation back to north -->
+    <button
+      class="ctrl-btn"
+      id="compass-btn"
+      title="Reset map north"
+      aria-label="Reset north"
+    >
+      <i class="fa-solid fa-compass"></i>
+    </button>
+
+    <!--
+        FULLSCREEN TOGGLE
+        The icon has its own id so JavaScript can swap it between:
+          fa-expand   (→ enter fullscreen)
+          fa-compress (→ exit fullscreen)
+      -->
+    <button
+      class="ctrl-btn"
+      onclick="toggleFullscreen()"
+      title="Fullscreen"
+      aria-label="Toggle fullscreen"
+    >
+      <i class="fa-solid fa-expand" id="fullscreen-icon"></i>
+    </button>
+  </div>
+  <!-- end #right-controls -->
+
+  <!-- ----------------------------------------------------------
+      LAYER SWITCHER BUTTON  (#layer-switcher)
+      A small floating button at the bottom-right corner of the map.
+      Clicking it cycles through map styles (Default → Satellite → etc.).
+      The <span id="layer-label"> text is updated by JavaScript.
+    ---------------------------------------------------------- -->
+  <button
+    id="layer-switcher"
+    onclick="switchLayer()"
+    title="Switch map style"
+    aria-label="Switch map style"
+  >
+    <i class="fa-solid fa-layer-group"></i>
+    <span id="layer-label">Default</span>
+  </button>
+
+  <!-- ----------------------------------------------------------
+      DIRECTIONS PANEL  (#directions-panel)
+      Floats over the top-left of the map.
+      Hidden by default (CSS: display:none).
+      Appears when the user clicks "Directions" in the sidebar.
+
+      "role=dialog" tells screen readers this is a popup panel.
+    ---------------------------------------------------------- -->
+  <div id="directions-panel" role="dialog" aria-label="Directions">
+    <!-- Blue header with title and close button -->
+    <div id="directions-header">
+      <h3><i class="fa-solid fa-route"></i> Directions</h3>
+      <button
+        onclick="closeDirections()"
+        title="Close"
+        aria-label="Close directions"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!--
+        TRANSPORT MODE BUTTONS
+        Three buttons: Car / Bicycle / Walking.
+        The active one gets class "active" (highlighted in blue).
+        JavaScript moves the "active" class when the user switches modes.
+      -->
+    <div id="directions-modes">
+      <button
+        class="mode-btn active"
+        onclick="setDirectionMode(this, 'driving')"
+        title="Driving"
+      >
+        <i class="fa-solid fa-car"></i>
+      </button>
+      <button
+        class="mode-btn"
+        onclick="setDirectionMode(this, 'cycling')"
+        title="Cycling"
+      >
+        <i class="fa-solid fa-bicycle"></i>
+      </button>
+      <button
+        class="mode-btn"
+        onclick="setDirectionMode(this, 'walking')"
+        title="Walking"
+      >
+        <i class="fa-solid fa-person-walking"></i>
+      </button>
+    </div>
+
+    <!--
+        FROM / TO INPUTS WITH CONNECTOR VISUAL
+        Two columns side by side:
+          LEFT  (#waypoint-dots)  → blue dot, dashed line, red dot
+          RIGHT (#waypoint-fields) → the two text inputs
+        Together they look like a Google Maps route selector.
+      -->
+    <div id="directions-inputs">
+      <!-- Visual connector column -->
+      <div id="waypoint-dots">
+        <div class="dot blue-dot"></div>
+        <!-- start point marker -->
+        <div class="dot-line"></div>
+        <!-- dashed vertical line -->
+        <div class="dot red-dot"></div>
+        <!-- end point marker -->
+      </div>
+
+      <!-- Text input column -->
+      <div id="waypoint-fields">
+        <input
+          type="text"
+          id="from-input"
+          placeholder="Starting point (e.g. USTHB)"
+        />
+        <input type="text" id="to-input" placeholder="Destination" />
+      </div>
+    </div>
+    <!-- end #directions-inputs -->
+
+    <!-- GET ROUTE BUTTON — triggers the routing logic in JavaScript -->
+    <button id="get-route-btn" onclick="getRoute()">
+      <i class="fa-solid fa-diamond-turn-right"></i> Get Route
+    </button>
+
+    <!--
+        ROUTE SUMMARY
+        Empty to start. After the route is drawn, JavaScript inserts
+        text like: "🚗 12.4 km  ·  ⏱ 18 min"
+      -->
+    <div id="route-summary"></div>
+  </div>
+  <!-- end #directions-panel -->
+
+  <!-- ----------------------------------------------------------
+      PLACE INFO CARD  (#info-card)
+      A card that appears at the bottom-center of the map
+      when the user clicks on a location.
+      Hidden by default (CSS: display:none).
+      JavaScript adds class "open" to show it and fills in the data.
+    ---------------------------------------------------------- -->
+  <div id="info-card" role="dialog" aria-label="Place information">
+    <!-- Close button — positioned at the top-right corner of the card -->
+    <button id="info-close" onclick="closeInfoCard()" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Blue circle icon at the top of the card -->
+    <div id="info-icon">
+      <i class="fa-solid fa-location-dot"></i>
+    </div>
+
+    <!--
+        PLACE NAME AND COORDINATES
+        These both have ids so JavaScript can update them
+        with real data after the user clicks on the map.
+      -->
+    <h3 id="info-title">Place Name</h3>
+    <p id="info-sub">Click on the map to see coordinates</p>
+
+    <!--
+        LOCATION TAGS — small pill-shaped labels
+        JavaScript can add/remove these dynamically.
+      -->
+    <div id="info-tags">
+      <span class="tag">📍 Algiers</span>
+      <span class="tag">🗺️ Algeria</span>
+    </div>
+
+    <!--
+        ACTION BUTTONS — three buttons in a row
+        "card-btn primary" = solid blue (the main action)
+        "card-btn"         = outlined (secondary actions)
+      -->
+    <div class="card-actions">
+      <button class="card-btn primary" onclick="openDirections()">
+        <i class="fa-solid fa-diamond-turn-right"></i>
+        <span>Directions</span>
+      </button>
+      <button class="card-btn" onclick="saveCurrentPlace()">
+        <i class="fa-solid fa-star"></i>
+        <span>Save</span>
+      </button>
+      <button class="card-btn" onclick="shareLocation()">
+        <i class="fa-solid fa-share"></i>
+        <span>Share</span>
+      </button>
+    </div>
+  </div>
+  <!-- end #info-card -->
+
+  <!-- ----------------------------------------------------------
+      SAVED PLACES POPUP  (#saved-popup)
+      A small floating panel that lists bookmarked places.
+      Hidden by default. JavaScript fills #saved-list with rows.
+    ---------------------------------------------------------- -->
+  <div id="saved-popup" role="dialog" aria-label="Saved places">
+    <!-- Yellow header with title and close button -->
+    <div id="saved-popup-header">
+      <h3><i class="fa-solid fa-star"></i> Saved Places</h3>
+      <button onclick="closeSavedPlaces()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!--
+        Empty container — JavaScript will insert saved place rows here.
+        If no places are saved, JavaScript shows an empty-state message.
+      -->
+    <div id="saved-list"></div>
+  </div>
+  <!-- end #saved-popup -->
+
+  <!-- ----------------------------------------------------------
+      TOAST NOTIFICATION  (#toast)
+      A small pill-shaped message that briefly appears and fades away.
+      Examples: "Link copied!", "Place saved ✓", "Route cleared"
+
+      "role=alert"      → screen readers announce it immediately
+      "aria-live=polite"→ the announcement waits for the user to
+                          finish reading, then reads the new message
+    ---------------------------------------------------------- -->
+  <div id="toast" role="alert" aria-live="polite"></div>
+
+  <!-- ----------------------------------------------------------
+      SCALE BAR  (#scale-bar)
+      A small bar at the bottom-left of the map showing real-world
+      distance (e.g. "500 m" or "2 km").
+      JavaScript recalculates it every time the user zooms.
+        #scale-line  → the horizontal bar (its width changes)
+        #scale-label → the text label below it
+    ---------------------------------------------------------- -->
+  <div id="scale-bar">
+    <div id="scale-line"></div>
+    <span id="scale-label">-- km</span>
+  </div>
+</div>
+<!-- end #main -->
+
+<!-- ============================================================
+    BOTTOM TRANSPORT TABS  (#bottom-tabs)
+    A row of five tabs always visible at the very bottom on mobile.
+    On desktop they are hidden (the sidebar takes over navigation).
+
+    We use <nav> because these are navigation controls.
+    Each <button class="tab"> has an icon above a text label.
+    The "active" class highlights the currently selected tab.
+  ============================================================ -->
+<nav id="bottom-tabs" aria-label="Transport modes">
+  <button class="tab active" onclick="setTab(this, 'Explore')">
+    <i class="fa-solid fa-map"></i>
+    <span>Explore</span>
+  </button>
+
+  <button class="tab" onclick="setTab(this, 'Driving')">
+    <i class="fa-solid fa-car"></i>
+    <span>Driving</span>
+  </button>
+
+  <button class="tab" onclick="setTab(this, 'Transit')">
+    <i class="fa-solid fa-bus"></i>
+    <span>Transit</span>
+  </button>
+
+  <button class="tab" onclick="setTab(this, 'Cycling')">
+    <i class="fa-solid fa-bicycle"></i>
+    <span>Cycling</span>
+  </button>
+
+  <button class="tab" onclick="setTab(this, 'Walking')">
+    <i class="fa-solid fa-person-walking"></i>
+    <span>Walking</span>
+  </button>
+</nav>
+<!-- end #bottom-tabs -->
+
+<!-- ============================================================
+    JAVASCRIPT LIBRARIES — loaded at the BOTTOM of <body>
+
+    WHY at the bottom and not in <head>?
+    The browser reads HTML top-to-bottom. If a <script> is in <head>,
+    the browser STOPS rendering the page until the script downloads
+    and runs. By putting scripts at the bottom, the whole page is
+    visible first, then the scripts load. This makes the page
+    feel much faster to the user.
+  ============================================================ -->
+
+<!-- Leaflet JS — the core map engine (must come before routing) -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Leaflet Routing Machine — adds directions support to Leaflet -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<!--
+    OUR OWN JAVASCRIPT FILE
+    Will contain all map setup, search logic, sidebar toggle, etc.
+    Uncomment this line once you create app.js:
+  -->
+<script src="app.js"></script>

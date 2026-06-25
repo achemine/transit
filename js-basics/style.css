@@ -1,0 +1,332 @@
+/*
+  ================================================================
+  style.css — My Maps App
+  ================================================================
+
+  HOW TO READ THIS FILE
+  ─────────────────────
+  Every section has a comment block BEFORE it explaining:
+    • WHAT it styles
+    • WHY each property is there
+    • WHAT would break if you removed it
+
+  Sections in order:
+   1.  CSS Variables       (named colors & sizes — change once, updates everywhere)
+   2.  Reset & Base        (browser defaults removed, global settings applied)
+   3.  Top Search Bar      (#top-bar, #search-box, #search-results)
+   */
+
+:root {
+  /* ── COLORS ─────────────────────────────────────────── */
+  --blue: #1a73e8; /* Main accent color — used for buttons, highlights*/
+  --blue-dark: #1558b0; /* A darker blue — used when hovering over blue buttons*/
+  --blue-light: #e8f0fe; /* Very light blue — used for icon backgrounds*/
+  --red: #ea4335; /* Destination pin color & danger indicators*/
+  --green: #34a853; /* Success / GPS location dot color*/
+  --yellow: #fbbc04; /* Star / saved places icon color*/
+  --orange: #ff6d00; /* Restaurant and food icon color*/
+
+  /* ── NEUTRAL COLORS (light mode) ──────────────────────────── */
+  --bg-primary: #ffffff; /* White — used for cards, bars, panels*/
+  --bg-secondary: #f8f9fa; /* Off-white — used for the page background*/
+  --bg-tertiary: #f1f3f4; /* Light grey — used for input fields and hover states*/
+  --border: #e0e0e0; /* Subtle grey lines — used for dividers and outlines*/
+  --text-primary: #202124; /* Near-black — main text color*/
+  --text-secondary: #5f6368; /* Medium grey — subtitle and icon color*/
+  --text-hint: #9aa0a6; /* Light grey — placeholder text color*/
+
+  /* ── SHADOWS ────────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.12); /* Small shadow for the top bar    */
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.16); /* Medium shadow for panels, cards  */
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2); /* Large shadow for big modals      */
+
+  /* ── BORDER RADIUS (rounded corners) ───────────────────────── */
+  --radius-sm: 8px; /* Slight rounding — inputs, small buttons   */
+  --radius-md: 12px; /* Medium rounding — panels, popups          */
+  --radius-lg: 20px; /* Strong rounding — cards, directions panel */
+  --radius-pill: 999px; /* Fully rounded (pill shape) — search box   */
+
+  /* ── LAYOUT SIZES ───────────────────────────────────────────── */
+  --topbar-height: 64px; /* Height of the search bar at the top     */
+  --bottombar-height: 58px; /* Height of the transport tabs at bottom  */
+  --sidebar-width: 340px; /* Sidebar width on desktop screens        */
+  --sidebar-width-sm: 280px; /* Sidebar width on tablet screens         */
+
+  /* ── ANIMATION SPEED ────────────────────────────────────────── */
+  --speed: 0.25s; /* 0.25 seconds — quick but smooth                   */
+}
+
+*,
+*::before,
+*::after {
+  margin: 0; /* Remove all default outer spacing     */
+  padding: 0; /* Remove all default inner spacing     */
+  box-sizing: border-box;
+}
+
+/*
+  HTML AND BODY — fill the entire browser window.
+  "overflow: hidden" stops the page from scrolling —
+  the map itself handles its own pan/scroll internally.
+*/
+html,
+body {
+  height: 100%; /* Fill the full browser window height */
+  overflow: hidden; /* No page scroll — the map handles it */
+}
+
+body {
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 14px; /* Default text size for the whole app   */
+  color: var(--text-primary); /* Near-black text everywhere by default */
+  background: var(--blue); /* Light grey page background       */
+  display: flex; /* Enable flexbox layout                 */
+  flex-direction: column; /* Stack children top-to-bottom          */
+}
+
+/*
+  BUTTON RESET — remove the default browser button appearance.
+  By default, buttons have a grey border and background.
+  We remove all of that and style each button ourselves.
+*/
+button {
+  border: none; /* No grey border              */
+  background: none; /* No grey background          */
+  cursor: pointer; /* Show a hand cursor on hover */
+  font-family: inherit; /* Use Roboto (same as body)   */
+  font-size: inherit; /* Use 14px (same as body)     */
+}
+
+/* Remove the bullet points from <ul> lists (sidebar uses these) */
+ul {
+  list-style: none;
+}
+
+/*
+  FOCUS STYLES — accessibility for keyboard and screen reader users.
+  When someone navigates using Tab, show a blue outline (:focus-visible).
+  When clicking with a mouse, hide the outline (:focus:not(:focus-visible)).
+  This way keyboard users see where they are, but mouse users do not see
+  an ugly box after every click.
+*/
+button:focus-visible,
+input:focus-visible {
+  outline: none;
+}
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none; /* Hide ring on mouse click */
+}
+
+/* ================================================================
+   3. TOP SEARCH BAR  (#top-bar)
+   ================================================================
+   The white bar always fixed at the top of the screen.
+   Uses flexbox to place its three children side by side:
+     [hamburger]  [search box ← grows to fill space →]  [buttons]
+   ================================================================ */
+#top-bar {
+  display: flex; /* Lay children side by side                 */
+  align-items: center; /* Vertically centre all children            */
+  gap: 10px; /* Space between hamburger, box, and buttons */
+  padding: 10px 14px; /* Inner spacing: 10px top/bottom, 14px left/right */
+  height: var(--topbar-height); /* Fixed 64px height                  */
+  position: relative; /* Needed so the dropdown can be positioned
+                             relative to this bar (see #search-results) */
+  z-index: 1000; /* Float above the map and sidebar           */
+  flex-shrink: 0; /* Never let this bar shrink in height       */
+}
+
+/* ── HAMBURGER MENU BUTTON (#menu-btn) ────────────────────────── */
+#menu-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%; /* Circle shape                    */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centre the icon inside the circle */
+  font-size: 20px;
+  color: var(--text-secondary); /* Grey icon colour                */
+  flex-shrink: 0; /* Never squash this button        */
+  background: var(--bg-secondary); /* White background                   */
+  transition: background var(--speed);
+  border: 1.5px solid var(--border); /* Thin grey outline   */
+}
+/* Change background when the mouse hovers over it */
+#menu-btn:hover {
+  background: var(--bg-tertiary); /* Light grey on hover */
+  border-color: var(--blue); /* Blue border on hover */
+  color: var(--blue); /* Blue icon on hover   */
+}
+
+/* ── SEARCH BOX (#search-box) ──────────────────────────────────── */
+#search-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon, input, buttons */
+  background: var(--bg-tertiary); /* Light grey background               */
+  border-radius: var(--radius-pill); /* Fully rounded pill shape            */
+  padding: 0 14px; /* Left and right inner spacing        */
+  height: 44px;
+  border: 2px solid transparent;
+  background: var(--bg-secondary); /* White background                   */
+  transition:
+    border-color var(--speed),
+    background var(--speed),
+    box-shadow var(--speed);
+}
+
+/*
+  When the user clicks inside the search box (any child inside it is focused),
+  highlight it with a blue border and white background.
+  ":focus-within" = "this element contains a focused child".
+*/
+#search-box:focus-within {
+  border-color: var(--blue); /* Blue outline                   */
+  background: var(--bg-primary); /* Turn white when active         */
+  box-shadow: var(--shadow-sm); /* Add a small shadow for depth   */
+  background: var(--bg-secondary); /* White background                   */
+}
+
+/* The magnifying glass icon inside the search box */
+#search-box > i {
+  color: var(--text-hint); /* Light grey icon colour  */
+  font-size: 16px;
+  flex-shrink: 0; /* Never squash the icon   */
+  background: var(--bg-secondary); /* White background                   */
+}
+
+/* The text input inside the search box */
+#search-input {
+  flex: 1; /* Grow to fill the space between the two icons */
+  border: none; /* Remove default input border                  */
+  background: transparent; /* Show the search box background through it */
+  font-size: 15px;
+  color: var(--text-primary);
+  min-width: 0;
+}
+/* Style the placeholder text (the grey hint text inside the input) */
+#search-input::placeholder {
+  color: var(--text-hint); /* Light grey placeholder */
+}
+
+/* The × (clear) button inside the search box */
+#clear-btn {
+  color: var(--text-hint);
+  font-size: 15px;
+  padding: 4px;
+  display: none;
+  /*
+    Hidden by default — JavaScript will switch this to "display: inline-flex"
+    when the user types something in the search box.
+  */
+  border-radius: 50%;
+  transition: background var(--speed);
+}
+#clear-btn:hover {
+  background: var(--border); /* Grey circle on hover */
+}
+
+/* The → (submit) button inside the search box */
+#search-btn {
+  color: var(--blue); /* Blue arrow icon             */
+  font-size: 17px;
+  padding: 4px 6px;
+  border-radius: 50%;
+  transition: background var(--speed);
+}
+#search-btn:hover {
+  background: var(--blue-light); /* Light blue circle on hover */
+}
+
+/* ── RIGHT-SIDE ACTION BUTTONS (#top-actions) ─────────────────── */
+#top-actions {
+  display: flex;
+  gap: 6px; /* Space between the two buttons */
+  flex-shrink: 0; /* Do not let these buttons shrink */
+}
+/* Style both buttons inside #top-actions the same way */
+#top-actions button {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%; /* Circle shape            */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border); /* Thin grey outline   */
+  background: var(--bg-primary); /* White background    */
+  transition:
+    background var(--speed),
+    border-color var(--speed);
+}
+#top-actions button:hover {
+  background: var(--bg-tertiary); /* Light grey on hover */
+  border-color: var(--blue); /* Blue border on hover */
+  color: var(--blue); /* Blue icon on hover   */
+}
+
+/* ── SEARCH RESULTS DROPDOWN (#search-results) ─────────────────── */
+#search-results {
+  position: absolute; /* Position relative to #top-bar (which is position:relative) */
+  top: calc(100% + 4px);
+  /*
+    calc() lets us do maths in CSS.
+    "100%" = the full height of the top-bar.
+    "+ 4px" = 4px gap below the bar.
+    Result: the dropdown appears just below the top bar.
+  */
+  left: 60px; /* Align with the left edge of the search box */
+  right: 110px; /* Align with the right edge of the search box */
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 2000; /* Must be above everything else (even above sidebar) */
+  display: none; /* Hidden by default — JavaScript shows it while typing */
+  max-height: 320px;
+  overflow-y: auto; /* Scroll if there are many results */
+}
+
+/* One row inside the dropdown */
+.result-item {
+  display: flex;
+  align-items: flex-start; /* Align icon to the top of the text */
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-tertiary); /* Thin divider between rows */
+  transition: background var(--speed);
+}
+.result-item:hover {
+  background: var(--bg-secondary); /* Light grey highlight on hover */
+}
+/* Remove the divider from the last row — it would look odd at the bottom */
+.result-item:last-child {
+  border-bottom: none;
+}
+
+/* The location pin icon inside each result row */
+.result-item i {
+  color: var(--blue);
+  font-size: 16px;
+  margin-top: 2px; /* Tiny nudge down to align with the first line of text */
+  flex-shrink: 0;
+}
+
+/* Text column inside each result row */
+.result-item-text {
+  display: flex;
+  flex-direction: column; /* Stack name above detail */
+  gap: 2px;
+}
+.result-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.result-item-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+}

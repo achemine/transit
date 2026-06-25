@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transit</title>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <header id="top-bar">
+      <!-- menu button -->
+      <button id="menu-btn" title="Open menu" aria-label="Open menu">
+        <i class="fa-solid fa-bars"> </i>
+      </button>
+
+      <!-- SEARCH BOX -->
+      <div id="search-box">
+        <!-- magnifying glass icon(purely decorative) -->
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <!-- THE ACTUAL TEXT INPUT -->
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search places, addresses…"
+          autocomplete="on"
+          aria-label="Search"
+          spellcheck="true"
+        />
+
+        <!-- CLEAR BUTTON (×) -->
+        <button id="clear-btn" title="Clear search" aria-label="Clear">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <!-- SUBMIT BUTTON — sends the search query (handled by JavaScript) -->
+        <button id="search-btn" title="Search" aria-label="Search">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+      <!-- end #search-box -->
+
+      <!-- RIGHT-SIDE ICON BUTTONS — grouped in a <div> for easy styling -->
+      <div id="top-actions">
+        <!-- GPS / locate-me button -->
+        <button
+          id="locate-btn"
+          title="Find my location"
+          aria-label="Find my location"
+        >
+          <i class="fa-solid fa-location-crosshairs"></i>
+        </button>
+
+        <!-- Dark mode toggle — JavaScript will switch the body class -->
+        <button
+          id="dark-mode-btn"
+          title="Toggle dark mode"
+          aria-label="Toggle dark mode"
+        >
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+
+      <!--SEARCH RESULTS DROPDOWN-->
+      <div id="search-results" role="listbox" aria-label="Search results"></div>
+    </header>
+
+    <div id="main">
+      <!------------------LEFT SIDEBAR  (#sidebar)------------------------>
+      <nav id="sidebar" aria-label="Main navigation">
+        <div id="sidebar-header">
+          <!-- Profile row: avatar circle + name + email -->
+          <div id="sidebar-profile">
+            <div id="avatar">U</div>
+
+            <div>
+              <div id="avatar-name">user_test</div>
+              <div id="avatar-email">transit@example.com</div>
+            </div>
+          </div>
+
+          <!-- Close button — visible on mobile to dismiss the sidebar -->
+          <button id="sidebar-close" title="Close menu" aria-label="Close menu">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+
+          <!-- settings button -->
+          <button id="settings-btn" title="Settings" aria-label="Settings">
+            <i class="fa-solid fa-gear"></i>
+          </button>
+        </div>
+        <!-- end #sidebar-header -->
+
+        <!--SIDEBAR ITEMS-->
+
+        <!-- Section label — small uppercase grey text acting as a divider -->
+        <div class="sidebar-section-label">Navigation</div>
+
+        <!-- home placeholder -->
+        <div class="sidebar-item" onclick="goHome()">
+          <div class="sidebar-icon home-icon">
+            <i class="fa-solid fa-house"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Home</span>
+          </div>
+        </div>
+
+        <!-- work placeholder -->
+        <div class="sidebar-item" onclick="goWork()">
+          <div class="sidebar-icon work-icon">
+            <i class="fa-solid fa-briefcase"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Work</span>
+          </div>
+        </div>
+
+        <!-- directions placeholder -->
+        <div class="sidebar-item" onclick="openDirections()">
+          <div class="sidebar-icon route-icon">
+            <i class="fa-solid fa-route"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Directions</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section-label">Places</div>
+
+        <!-- saved places placeholder -->
+        <div class="sidebar-item" onclick="showSavedPlaces()">
+          <div class="sidebar-icon saved-icon">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Saved places</span>
+          </div>
+        </div>
+
+        <!-- metro stations placeholder -->
+        <div class="sidebar-item" onclick="showNearby('metro stations')">
+          <div class="sidebar-icon subway-icon">
+            <i class="fa-solid fa-subway"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">metro stations</span>
+          </div>
+        </div>
+
+        <!-- bus stations placeholder -->
+        <div class="sidebar-item" onclick="showNearby('bus stations')">
+          <div class="sidebar-icon bus-icon">
+            <i class="fa-solid fa-bus"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">bus stations</span>
+          </div>
+        </div>
+
+        <!-- train stations placeholder -->
+        <div class="sidebar-item" onclick="showNearby('train stations')">
+          <div class="sidebar-icon train-icon">
+            <i class="fa-solid fa-train"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">train stations</span>
+          </div>
+        </div>
+
+        <!-- tram stations placeholder -->
+        <div class="sidebar-item" onclick="showNearby('tram stations')">
+          <div class="sidebar-icon tram-icon">
+            <i class="fa-solid fa-train-tram"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">tram stations</span>
+          </div>
+        </div>
+
+        <!-- cable car terminals placeholder -->
+        <div class="sidebar-item" onclick="showNearby('cable car terminals')">
+          <div class="sidebar-icon cable-car-icon">
+            <i class="fa-solid fa-cable-car"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">cable car terminals</span>
+          </div>
+        </div>
+
+        <div class="sidebar-section-label">Map</div>
+
+        <!-- switch map style placeholder -->
+        <div class="sidebar-item" onclick="switchLayer()">
+          <div class="sidebar-icon layer-icon">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Switch map style</span>
+            <span class="sidebar-sub" id="current-layer-name"
+              >Currently: default</span
+            >
+          </div>
+        </div>
+
+        <!-- share map link placeholder -->
+        <div class="sidebar-item" onclick="shareLocation()">
+          <div class="sidebar-icon share-icon">
+            <i class="fa-solid fa-share-nodes"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Share map link</span>
+            <span class="sidebar-sub">Copy link to clipboard</span>
+          </div>
+        </div>
+
+        <!-- print map placeholder -->
+        <div class="sidebar-item" onclick="printMap()">
+          <div class="sidebar-icon print-icon">
+            <i class="fa-solid fa-print"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Print map</span>
+            <span class="sidebar-sub">Save as PDF or paper</span>
+          </div>
+        </div>
+
+        <div id="sidebar-footer">
+          <span>transit· personal Project</span>
+        </div>
+      </nav>
+      <!------------------------ end #sidebar ------------------------------------>
+
+      <!--DARK OVERLAY (mobile only)-->
+      <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+      <!-----------------------THE MAP--------------------------------------------->
+      <div id="map" aria-label="Interactive map"></div>
+
+      <!---------------------FLOATING RIGHT CONTROL BUTTONS------------------------>
+      <div id="right-controls">
+        <!-- ZOOM IN -->
+        <button
+          class="ctrl-btn"
+          onclick="map.zoomIn()"
+          title="Zoom in"
+          aria-label="Zoom in"
+        >
+          <i class="fa-solid fa-plus"></i>
+        </button>
+
+        <!-- ZOOM OUT -->
+        <button
+          class="ctrl-btn"
+          onclick="map.zoomOut()"
+          title="Zoom out"
+          aria-label="Zoom out"
+        >
+          <i class="fa-solid fa-minus"></i>
+        </button>
+
+        <!--VISUAL DIVIDER-->
+        <div class="ctrl-divider"></div>
+
+        <!-- COMPASS — resets the map rotation back to north -->
+        <button
+          class="ctrl-btn"
+          id="compass-btn"
+          title="Reset map north"
+          aria-label="Reset north"
+        >
+          <i class="fa-solid fa-compass"></i>
+        </button>
+
+        <!--FULLSCREEN TOGGLE-->
+        <button
+          class="ctrl-btn"
+          onclick="toggleFullscreen()"
+          title="Fullscreen"
+          aria-label="Toggle fullscreen"
+        >
+          <i class="fa-solid fa-expand" id="fullscreen-icon"></i>
+        </button>
+      </div>
+      <!-------------------------end #right-controls------------------------->
+
+      <!--LAYER SWITCHER BUTTON-->
+      <button
+        id="layer-switcher"
+        onclick="switchLayer()"
+        title="Switch map style"
+        aria-label="Switch map style"
+      >
+        <i class="fa-solid fa-layer-group"></i>
+        <span id="layer-label">Default</span>
+      </button>
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

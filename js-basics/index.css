@@ -1,0 +1,1172 @@
+/* ================================================================
+   4. MAIN LAYOUT  (#main)
+   ================================================================
+   This div fills ALL remaining height between the top bar and
+   the bottom tabs. It is a flex container that lays its children
+   side by side: [sidebar] [map + floating panels].
+   ================================================================ */
+#main {
+  flex: 1;
+  /*
+    flex: 1 tells this div to grow and fill ALL available space.
+    The top bar and bottom tabs have fixed heights.
+    #main gets everything else.
+  */
+  display: flex; /* Side-by-side layout for sidebar and map */
+  position: relative; /* Required so absolute children (panels) are
+                          positioned relative to this div */
+  overflow: hidden; /* Clip anything that would stick out      */
+  min-height: 0;
+  /*
+    min-height: 0 is a flexbox fix.
+    By default, flex children cannot shrink below their content height.
+    Without this, the main area would expand past the screen bottom
+    when the map content is tall.
+  */
+}
+
+/* ================================================================
+   5. SIDEBAR  (#sidebar)
+   ================================================================
+   A drawer that slides in from the left of the screen.
+   Position: "absolute" means it floats OVER the map.
+   On mobile:  slides in/out using CSS transform.
+   On desktop: always visible (transform removed in @media query).
+   ================================================================ */
+#sidebar {
+  width: var(--sidebar-width-sm); /* 280px on tablet */
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column; /* Stack header, items, footer top-to-bottom */
+  z-index: 700; /* Above the map (z-index 0) and controls (400) */
+  position: absolute; /* Float over the map, not push it aside       */
+  top: 0;
+  left: 0;
+  height: 100%;
+  transform: translateX(-100%);
+  /*
+    translateX(-100%) moves the sidebar 100% of ITS OWN WIDTH to the left.
+    This hides it off-screen. Since it is 280px wide, it moves -280px left.
+    The map fills the whole screen, and the sidebar is invisible.
+  */
+  transition: transform var(--speed) ease;
+  /* This makes the slide-in animation smooth instead of instant */
+  overflow-y: auto; /* If there are many sidebar items, allow scrolling */
+}
+
+/*
+  When JavaScript adds the class "open" to the sidebar,
+  this rule removes the transform and the sidebar slides into view.
+*/
+#sidebar.open {
+  transform: translateX(0); /* No offset — sidebar is fully visible */
+}
+
+/* ── DARK OVERLAY (#sidebar-overlay) ────────────────────────────── */
+/*
+  A semi-transparent black layer that appears behind the open sidebar
+  on mobile. It blocks interaction with the map until sidebar is closed.
+*/
+#sidebar-overlay {
+  display: none; /* Hidden by default */
+  position: absolute;
+  inset: 0;
+  /*
+    "inset: 0" is a shorthand for: top: 0; right: 0; bottom: 0; left: 0;
+    It stretches this element to cover the entire #main area.
+  */
+  background: rgba(0, 0, 0, 0.35); /* 35% transparent black */
+  z-index: 699; /* Just BELOW the sidebar (700) so the sidebar shows on top */
+}
+/* JavaScript adds "visible" class when the sidebar opens */
+#sidebar-overlay.visible {
+  display: block;
+}
+
+/* ── SIDEBAR HEADER (#sidebar-header) ────────────────────────────── */
+/* The blue top section of the sidebar with avatar and close button  */
+#sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Push avatar left, close button right */
+  padding: 20px 16px 16px;
+  background: var(--blue); /* Solid blue background               */
+  color: white;
+  flex-shrink: 0; /* Never let this header squash when sidebar overflows */
+}
+
+/* The row with avatar circle + name + email */
+#sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* The circular avatar with the letter "U" */
+#avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%; /* Perfect circle              */
+  background: white; /* White circle on blue header */
+  color: var(--blue); /* Blue letter inside          */
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+#avatar-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: white;
+}
+#avatar-email {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 2px;
+}
+/* rgba(255,255,255,0.8) = white at 80% opacity = slightly transparent white */
+
+/* The × close button in the sidebar header */
+#sidebar-close {
+  color: white;
+  font-size: 20px;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background var(--speed);
+}
+#sidebar-close:hover {
+  background: rgba(255, 255, 255, 0.15); /* Slightly lighter circle on hover */
+}
+
+/* ── SIDEBAR SECTION LABEL ──────────────────────────────────────── */
+/* Small uppercase grey heading used to separate groups of items     */
+.sidebar-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase; /* Force all letters to caps        */
+  letter-spacing: 0.08em; /* Tiny space between letters (more readable) */
+  color: var(--text-hint); /* Light grey text                  */
+  padding: 16px 16px 6px; /* Top padding creates vertical gap */
+}
+
+/* ── SIDEBAR ITEM ROW (.sidebar-item) ──────────────────────────── */
+/* Each clickable row in the sidebar                                 */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px; /* Space between icon circle and text         */
+  padding: 12px 16px; /* Inner spacing for the row                  */
+  cursor: pointer; /* Hand cursor on hover                       */
+  border-radius: var(--radius-sm);
+  margin: 2px 8px; /* Small margin so rounded corners are visible */
+  transition: background var(--speed);
+}
+.sidebar-item:hover {
+  background: var(--bg-secondary); /* Light grey background on hover */
+}
+
+/* ── SIDEBAR ICON CIRCLES (.sidebar-icon) ───────────────────────── */
+/* The coloured circle that holds the icon on the left of each row  */
+.sidebar-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* Circle shape                */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0; /* Never squash the icon circle */
+}
+
+/* Each item type gets its own background and icon colour */
+.home-icon {
+  background: var(--blue-light);
+  color: var(--blue);
+} /* Light blue   */
+.work-icon {
+  background: #e6f4ea;
+  color: var(--green);
+} /* Light green  */
+.route-icon {
+  background: #fce8e6;
+  color: var(--red);
+} /* Light red    */
+.saved-icon {
+  background: #fef9e7;
+  color: var(--yellow);
+} /* Light yellow */
+.food-icon {
+  background: #fff3e0;
+  color: var(--orange);
+} /* Light orange */
+.hospital-icon {
+  background: #fce8e6;
+  color: var(--red);
+} /* Light red    */
+.layer-icon {
+  background: #e8eaf6;
+  color: #3949ab;
+} /* Light indigo */
+.share-icon {
+  background: var(--blue-light);
+  color: var(--blue);
+} /* Light blue   */
+.print-icon {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+} /* Grey */
+
+/* ── SIDEBAR TEXT COLUMN (.sidebar-text) ───────────────────────── */
+.sidebar-text {
+  display: flex;
+  flex-direction: column; /* Stack title above subtitle */
+  gap: 2px;
+}
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.sidebar-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── SIDEBAR FOOTER (#sidebar-footer) ──────────────────────────── */
+#sidebar-footer {
+  margin-top: auto;
+  /*
+    "margin-top: auto" pushes this element to the BOTTOM of a flex container.
+    All the items above it take only as much space as they need,
+    and the remaining space goes into this top margin.
+    This "sticks" the footer to the bottom regardless of how many items exist.
+  */
+  padding: 16px;
+  font-size: 11px;
+  color: var(--text-hint);
+  border-top: 1px solid var(--bg-tertiary); /* Thin divider line above footer */
+  text-align: center;
+}
+
+/* ================================================================
+   6. MAP CONTAINER  (#map)
+   ================================================================
+   This is the empty div where Leaflet draws the interactive map.
+   It must have a definite height — Leaflet needs to know how big
+   the container is so it can calculate which map tiles to load.
+   "flex: 1" makes it fill all remaining width inside #main.
+   ================================================================ */
+#map {
+  flex: 1; /* Fill all horizontal space not taken by the sidebar */
+  height: 100%; /* Fill the full height of #main                     */
+}
+
+/*
+  LEAFLET POPUP OVERRIDES
+  Leaflet draws popups with its own default styles.
+  We override them here to match our app's design.
+  "!important" forces our rule to win over Leaflet's own CSS.
+*/
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md) !important; /* Rounded corners */
+  box-shadow: var(--shadow-md) !important; /* Our depth shadow */
+  padding: 0 !important; /* We handle padding inside */
+}
+.leaflet-popup-content {
+  margin: 14px 16px !important;
+  font-family: "Roboto", Arial, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+.leaflet-popup-tip {
+  background: var(--bg-primary) !important; /* White triangle tip */
+}
+
+/* ================================================================
+   7. FLOATING RIGHT CONTROLS  (#right-controls)
+   ================================================================
+   A group of buttons that floats over the map on the right side.
+   "position: absolute" + "right: 14px" + "top: 50%; translateY(-50%)"
+   centres it vertically on the right edge of the map.
+   ================================================================ */
+#right-controls {
+  position: absolute; /* Float over the map                        */
+  right: 14px; /* 14px from the right edge                  */
+  top: 50%; /* Start at 50% from the top                 */
+  transform: translateY(-50%);
+  /*
+    "translateY(-50%)" moves this element up by half its OWN height.
+    Combined with "top: 50%", this perfectly centres it vertically.
+    This trick works no matter how tall the controls group is.
+  */
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically      */
+  z-index: 400; /* Above the map but below panels */
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden; /* Clip the buttons to the rounded corners */
+}
+
+/* Each button inside the controls panel */
+.ctrl-btn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  transition:
+    background var(--speed),
+    color var(--speed);
+}
+.ctrl-btn:hover {
+  background: var(--bg-tertiary); /* Light grey on hover  */
+  color: var(--blue); /* Blue icon on hover   */
+}
+
+/* Thin horizontal line divider between the zoom and other buttons */
+.ctrl-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0 6px; /* Indent slightly so it does not touch the edges */
+}
+
+/* ================================================================
+   8. LAYER SWITCHER BUTTON  (#layer-switcher)
+   ================================================================
+   A small floating button at the bottom-right corner of the map.
+   Shows the current map style name and lets the user switch it.
+   ================================================================ */
+#layer-switcher {
+  position: absolute; /* Float over the map                */
+  bottom: 14px; /* 14px from the bottom              */
+  right: 14px; /* 14px from the right               */
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  padding: 8px 14px; /* Inner spacing                     */
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between icon and text label */
+  box-shadow: var(--shadow-md);
+  border: 1.5px solid var(--border);
+  transition:
+    background var(--speed),
+    border-color var(--speed);
+}
+#layer-switcher:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+#layer-switcher i {
+  font-size: 15px;
+}
+
+/* ================================================================
+   9. DIRECTIONS PANEL  (#directions-panel)
+   ================================================================
+   A floating panel at the top-left of the map.
+   Hidden by default. JavaScript shows it when the user
+   clicks "Directions" in the sidebar.
+   ================================================================ */
+#directions-panel {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 300px;
+  z-index: 600; /* Above controls (400) but below top-bar (1000) */
+  display: none; /* Invisible until JavaScript shows it            */
+  overflow: hidden; /* Clip children to the rounded corners         */
+}
+
+/* Blue header row inside the directions panel */
+#directions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+  background: var(--blue);
+  color: white;
+}
+#directions-header h3 {
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Space between route icon and "Directions" text */
+}
+#directions-header button {
+  color: white;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background var(--speed);
+}
+#directions-header button:hover {
+  background: rgba(255, 255, 255, 0.2); /* Lighter white circle on hover */
+}
+
+/* ── TRANSPORT MODE BUTTONS (#directions-modes) ─────────────────── */
+#directions-modes {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bg-tertiary); /* Divider below this row */
+}
+
+/* Individual mode button (car / bike / walking) */
+.mode-btn {
+  flex: 1; /* Each button takes equal width */
+  height: 36px;
+  border-radius: var(--radius-sm);
+  font-size: 17px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  transition:
+    background var(--speed),
+    color var(--speed);
+}
+.mode-btn:hover {
+  background: var(--blue-light); /* Light blue on hover */
+  color: var(--blue);
+}
+/* The currently selected mode gets a solid blue highlight */
+.mode-btn.active {
+  background: var(--blue);
+  color: white;
+}
+
+/* ── FROM / TO INPUTS (#directions-inputs) ──────────────────────── */
+#directions-inputs {
+  display: flex; /* Two columns side by side            */
+  align-items: stretch; /* Both columns stretch to same height */
+  gap: 10px;
+  padding: 16px;
+}
+
+/* Left column: blue dot, dashed line, red dot */
+#waypoint-dots {
+  display: flex;
+  flex-direction: column; /* Stack dot → line → dot vertically */
+  align-items: center;
+  padding-top: 12px; /* Align the first dot with the first input */
+}
+
+/* The dot circles (blue for start, red for end) */
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%; /* Circle */
+  flex-shrink: 0;
+}
+.blue-dot {
+  background: var(--blue);
+}
+.red-dot {
+  background: var(--red);
+}
+
+/* The dashed vertical line connecting the two dots */
+.dot-line {
+  flex: 1; /* Stretch to fill all space between the two dots */
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border) 0px,
+    /* Grey line for 4px  */ var(--border) 4px,
+    transparent 4px,
+    /* Empty gap for 4px  */ transparent 8px /* Pattern repeats every 8px */
+  );
+  /*
+    "repeating-linear-gradient" creates a repeating pattern.
+    Here: draw 4px of border colour, then 4px of transparent,
+    then repeat. The result looks like a dashed line.
+  */
+  min-height: 20px; /* Ensure a visible line even with short inputs */
+  margin: 4px 0;
+}
+
+/* Right column: the two text inputs */
+#waypoint-fields {
+  flex: 1; /* Stretch to fill all remaining width */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Space between the two inputs */
+}
+#waypoint-fields input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition:
+    border-color var(--speed),
+    background var(--speed);
+}
+#waypoint-fields input:focus {
+  border-color: var(--blue); /* Blue border when clicked   */
+  background: var(--bg-primary); /* White background on focus  */
+}
+#waypoint-fields input::placeholder {
+  color: var(--text-hint); /* Light grey placeholder text */
+}
+
+/* GET ROUTE button */
+#get-route-btn {
+  margin: 0 16px 16px;
+  width: calc(100% - 32px);
+  /*
+    The panel is 300px wide. We want 16px padding on each side.
+    calc(100% - 32px) = 300px - 32px = 268px button width.
+    Using calc() instead of a fixed width means it adapts
+    if the panel width changes.
+  */
+  padding: 12px;
+  background: var(--blue);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background var(--speed),
+    transform var(--speed);
+}
+#get-route-btn:hover {
+  background: var(--blue-dark);
+}
+#get-route-btn:active {
+  transform: scale(0.98);
+}
+/* scale(0.98) = shrinks to 98% of size when pressed — a "click" feel */
+
+/* Route summary text (filled by JavaScript after route is drawn) */
+#route-summary {
+  padding: 0 16px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 16px;
+}
+#route-summary span {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Space between icon and text (e.g. clock icon + "18 min") */
+}
+
+/* ================================================================
+   10. PLACE INFO CARD  (#info-card)
+   ================================================================
+   A card that appears at the bottom-centre of the map
+   when the user clicks on a location.
+   Hidden by default. JavaScript shows it and fills in the data.
+   ================================================================ */
+#info-card {
+  position: absolute; /* Float over the map                          */
+  bottom: 14px; /* 14px from the bottom edge                   */
+  left: 50%; /* Start at the horizontal centre              */
+  transform: translateX(-50%);
+  /*
+    Same centring trick as the controls panel, but horizontal.
+    "left: 50%" sets the LEFT EDGE at the middle of the screen.
+    "translateX(-50%)" shifts it left by half its OWN width.
+    Together: the card is perfectly centred.
+  */
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 20px;
+  width: 360px;
+  max-width: calc(100vw - 28px);
+  /*
+    "100vw" = 100% of the viewport (screen) width.
+    "calc(100vw - 28px)" = screen width minus 14px padding on each side.
+    This prevents the card from going off-screen on narrow phones.
+  */
+  z-index: 600;
+  display: none; /* Hidden by default                              */
+  text-align: center;
+}
+/* JavaScript adds "open" class to make the card visible */
+#info-card.open {
+  display: block;
+}
+
+/* The × close button inside the card (top-right corner) */
+#info-close {
+  position: absolute; /* Position relative to #info-card */
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--speed);
+}
+#info-close:hover {
+  background: var(--border);
+}
+
+/* The blue circle with location pin icon at the top of the card */
+#info-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--blue-light);
+  color: var(--blue);
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  /* "margin: 0 auto" centres a block element horizontally */
+}
+#info-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+#info-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+/* Container for the pill-shaped location tags */
+#info-tags {
+  display: flex;
+  justify-content: center; /* Centre the tags horizontally */
+  gap: 8px;
+  flex-wrap: wrap; /* Allow tags to wrap to a new line if there are many */
+  margin-bottom: 16px;
+}
+/* One pill-shaped tag */
+.tag {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill); /* Fully rounded pill */
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Row of action buttons at the bottom of the card */
+.card-actions {
+  display: flex;
+  gap: 8px;
+}
+/* Each action button takes equal width ("flex: 1") */
+.card-btn {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--border);
+  background: var(--bg-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition:
+    background var(--speed),
+    border-color var(--speed);
+}
+.card-btn:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+/* The primary (main) action button has a solid blue background */
+.card-btn.primary {
+  background: var(--blue);
+  color: white;
+  border-color: var(--blue);
+}
+.card-btn.primary:hover {
+  background: var(--blue-dark);
+}
+
+/* ================================================================
+   11. SAVED PLACES POPUP  (#saved-popup)
+   ================================================================
+   A small floating panel that lists bookmarked places.
+   Hidden by default. JavaScript populates the list and shows it.
+   ================================================================ */
+#saved-popup {
+  position: absolute;
+  top: 14px;
+  right: 64px; /* Offset from the right edge to avoid the controls */
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 280px;
+  z-index: 600;
+  display: none; /* Hidden by default */
+  overflow: hidden;
+}
+
+/* Yellow header */
+#saved-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--yellow); /* Warm yellow header              */
+  color: #5c4000; /* Dark brown text (high contrast on yellow) */
+}
+#saved-popup-header h3 {
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#saved-popup-header button {
+  font-size: 18px;
+  color: #5c4000;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background var(--speed);
+}
+#saved-popup-header button:hover {
+  background: rgba(0, 0, 0, 0.1); /* Dark transparent circle on hover */
+}
+
+/* One row in the saved list */
+.saved-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-tertiary);
+  transition: background var(--speed);
+}
+.saved-item:hover {
+  background: var(--bg-secondary);
+}
+.saved-item:last-child {
+  border-bottom: none;
+}
+
+.saved-item i {
+  color: var(--yellow);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.saved-item-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.saved-item-coords {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Message shown when there are no saved places yet */
+.saved-empty {
+  padding: 20px 16px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+/* ================================================================
+   12. TOAST NOTIFICATION  (#toast)
+   ================================================================
+   A small dark pill that appears, delivers a message, then fades out.
+   "pointer-events: none" = user cannot accidentally click it.
+   "opacity: 0" hides it without removing it from the page flow.
+   JavaScript adds class "show" to make it visible.
+   ================================================================ */
+#toast {
+  position: absolute;
+  bottom: 70px; /* Float above the bottom area */
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  /*
+    Starts 20px lower than its final position.
+    When "show" is added, translateY becomes 0 and it slides up.
+    This creates a subtle slide-up entrance animation.
+  */
+  background: #323232; /* Dark grey background          */
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 800;
+  opacity: 0; /* Invisible by default          */
+  pointer-events: none; /* Cannot be clicked accidentally */
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+  white-space: nowrap; /* Prevent text from wrapping onto two lines */
+}
+/* JavaScript adds "show" to reveal it */
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0); /* Slide up to normal position */
+}
+
+/* ================================================================
+   13. SCALE BAR  (#scale-bar)
+   ================================================================
+   A small distance indicator at the bottom-left of the map.
+   JavaScript updates the width of #scale-line and the text of
+   #scale-label when the user zooms.
+   ================================================================ */
+#scale-bar {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+/* The horizontal bar (its width changes as you zoom) */
+#scale-line {
+  height: 4px;
+  width: 80px; /* JavaScript will change this dynamically */
+  background: var(--text-primary);
+  border-left: 2px solid var(--text-primary); /* Left end cap */
+  border-right: 2px solid var(--text-primary); /* Right end cap */
+  opacity: 0.7;
+}
+/* The text label below the bar (e.g. "2 km") */
+#scale-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: rgba(
+    255,
+    255,
+    255,
+    0.8
+  ); /* Semi-transparent white so it reads
+                                           on any map tile colour */
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* ================================================================
+   14. BOTTOM TRANSPORT TABS  (#bottom-tabs)
+   ================================================================
+   A row of five icon+label tabs at the very bottom of the screen.
+   Visible only on mobile. Hidden on desktop (see @media section).
+   "flex-shrink: 0" prevents it from squashing in the flex column.
+   ================================================================ */
+#bottom-tabs {
+  display: flex; /* Place all tabs side by side     */
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border); /* Thin line above the tabs */
+  height: var(--bottombar-height); /* Fixed 58px height        */
+  z-index: 1000; /* Above the map                    */
+  flex-shrink: 0; /* Never shrink this bar            */
+}
+
+/* Each individual tab button */
+.tab {
+  flex: 1; /* All five tabs share the width equally */
+  display: flex;
+  flex-direction: column; /* Stack icon above label            */
+  align-items: center;
+  justify-content: center;
+  gap: 3px; /* Space between icon and text       */
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-top: 3px solid transparent;
+  /*
+    The transparent top border acts as a placeholder.
+    When the tab is "active", this becomes blue.
+    Defining it upfront avoids a layout shift when it appears.
+  */
+  transition:
+    color var(--speed),
+    border-color var(--speed),
+    background var(--speed);
+  padding: 0 4px;
+}
+.tab i {
+  font-size: 19px;
+} /* Slightly larger icon than label text */
+
+/* Hover effect — only on non-active tabs */
+.tab:hover:not(.active) {
+  background: var(--bg-tertiary); /* Light grey highlight */
+}
+/* The currently selected tab */
+.tab.active {
+  color: var(--blue); /* Blue icon and label text  */
+  border-top-color: var(--blue); /* Blue line at the top    */
+}
+
+/* ================================================================
+   15. DARK MODE
+   ================================================================
+   When JavaScript adds class "dark" to the <body> element,
+   all these CSS variables are overridden with dark values.
+   Because EVERYTHING in the app uses var(--variable-name),
+   every colour updates automatically — no other CSS needs changing!
+   ================================================================ */
+body.dark {
+  --bg-primary: #1e2025;
+  --bg-secondary: #282c35;
+  --bg-tertiary: #33383f;
+  --border: #3d4148;
+  --text-primary: #e8eaed;
+  --text-secondary: #9aa0a6;
+  --text-hint: #5f6368;
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --blue-light: #1a2a4a; /* Darker blue tint for icon backgrounds */
+}
+
+/*
+  Fix the Leaflet attribution bar (the small "© OpenStreetMap" text)
+  to be readable in dark mode.
+*/
+body.dark .leaflet-control-attribution {
+  background: rgba(30, 32, 37, 0.8) !important;
+  color: #9aa0a6 !important;
+}
+body.dark .leaflet-control-attribution a {
+  color: #8ab4f8 !important; /* Light blue link colour on dark background */
+}
+
+/* ================================================================
+   16. RESPONSIVE DESIGN  (@media queries)
+   ================================================================
+   A media query is a block of CSS that ONLY activates when the
+   screen meets a condition (usually a minimum or maximum width).
+
+   Our breakpoints:
+     Mobile   → screens below  480px (narrow phones)
+     Tablet   → screens from   480px to  767px
+     Desktop  → screens from   768px to 1199px
+     Wide     → screens from  1200px and above
+   ================================================================ */
+
+/* ── TABLET (480px and above) ───────────────────────────────────── */
+@media (min-width: 480px) {
+  /* Use slightly wider sidebar on tablet */
+  :root {
+    --sidebar-width-sm: 300px;
+  }
+
+  /* Adjust dropdown alignment for the wider screen */
+  #search-results {
+    left: 66px;
+    right: 120px;
+  }
+
+  /* Saved popup can be bigger on tablet */
+  #saved-popup {
+    top: 14px;
+    right: 70px;
+    width: 300px;
+  }
+}
+
+/* ── DESKTOP (768px and above) ──────────────────────────────────── */
+@media (min-width: 768px) {
+  :root {
+    --topbar-height: 70px;
+    --bottombar-height: 0px; /* The bottom tabs height becomes 0 */
+    --sidebar-width-sm: var(--sidebar-width); /* Use full 340px sidebar */
+  }
+
+  /*
+    On desktop, the sidebar is permanently visible.
+    We switch it from "absolute" (floating) to "relative" (in the flow).
+    This pushes the map to the right instead of overlapping it.
+    We also remove the transform so it is never hidden off-screen.
+  */
+  #sidebar {
+    position: relative; /* Part of the page flow (not floating)     */
+    transform: none; /* Always visible — no slide-in needed       */
+    width: var(--sidebar-width); /* Full 340px width                  */
+    flex-shrink: 0; /* Never squash the sidebar                  */
+  }
+
+  /* The overlay is never needed on desktop */
+  #sidebar-overlay {
+    display: none !important;
+    /* "!important" ensures JavaScript cannot accidentally show it */
+  }
+
+  /* Directions panel shifts right to not overlap the sidebar */
+  #directions-panel {
+    left: calc(var(--sidebar-width) + 14px);
+    /* calc(340px + 14px) = 354px from left edge */
+    width: 320px;
+  }
+
+  /* Hide the bottom tabs — sidebar handles all navigation on desktop */
+  #bottom-tabs {
+    display: none;
+  }
+
+  /* Wider search results dropdown on larger screens */
+  #search-results {
+    left: 70px;
+    right: 140px;
+  }
+
+  /* Slightly bigger control buttons on desktop */
+  .ctrl-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+  }
+
+  /* Info card can be wider on desktop */
+  #info-card {
+    width: 400px;
+    bottom: 20px;
+  }
+
+  /* Adjust bottom elements for extra spacing */
+  #layer-switcher {
+    bottom: 20px;
+    right: 20px;
+  }
+  #scale-bar {
+    bottom: 20px;
+    left: 20px;
+  }
+}
+
+/* ── LARGE DESKTOP (1200px and above) ───────────────────────────── */
+@media (min-width: 1200px) {
+  :root {
+    --sidebar-width: 380px; /* Even wider sidebar on big screens */
+    --topbar-height: 72px;
+  }
+
+  /* Cap the search box width on very wide monitors */
+  #search-box {
+    max-width: 680px;
+    /* Without this, the search box would stretch all the way across a 4K screen */
+  }
+
+  /* More breathing room in the top bar */
+  #top-bar {
+    padding: 12px 20px;
+  }
+
+  /* More comfortable spacing for sidebar items */
+  .sidebar-item {
+    padding: 14px 20px;
+  }
+}
+
+/* ── MOBILE NARROW (below 480px) ────────────────────────────────── */
+@media (max-width: 479px) {
+  /*
+    On very narrow phones, hide the text labels under the tab icons.
+    The icons alone are enough — the labels would be too small to read.
+  */
+  .tab span {
+    display: none;
+  }
+  .tab {
+    font-size: 0;
+  } /* Remove any leftover text size */
+  .tab i {
+    font-size: 21px;
+  } /* Slightly bigger icon to compensate */
+
+  /* Hide the dark mode button on very narrow phones to save space */
+  #dark-mode-btn {
+    display: none;
+  }
+
+  /* Info card fills almost the full width on small phones */
+  #info-card {
+    width: calc(100vw - 20px);
+    bottom: 10px;
+  }
+
+  /* Allow card action buttons to wrap if they cannot fit in one row */
+  .card-actions {
+    flex-wrap: wrap;
+  }
+
+  /* Directions panel fills almost the full width */
+  #directions-panel {
+    left: 8px;
+    right: 8px;
+    width: auto; /* "auto" overrides the fixed 300px width */
+  }
+
+  /* Saved popup fills almost the full width */
+  #saved-popup {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+}
+
+/* ================================================================
+   17. PRINT STYLES
+   ================================================================
+   When the user prints the page or saves it as PDF,
+   we hide all the UI chrome (bars, panels, buttons) and
+   show only the map itself at full size.
+   ================================================================ */
+@media print {
+  /* Hide everything except the map */
+  #top-bar,
+  #sidebar,
+  #right-controls,
+  #layer-switcher,
+  #directions-panel,
+  #info-card,
+  #saved-popup,
+  #toast,
+  #bottom-tabs {
+    display: none !important;
+  }
+
+  /* Make the map fill the entire printed page */
+  #map {
+    position: fixed;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    width: 100vw; /* Full page width  */
+    height: 100vh; /* Full page height */
+  }
+}
