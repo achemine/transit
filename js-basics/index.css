@@ -1,38 +1,12 @@
-/* ================================================================
-   4. MAIN LAYOUT  (#main)
-   ================================================================
-   This div fills ALL remaining height between the top bar and
-   the bottom tabs. It is a flex container that lays its children
-   side by side: [sidebar] [map + floating panels].
-   ================================================================ */
 #main {
   flex: 1;
-  /*
-    flex: 1 tells this div to grow and fill ALL available space.
-    The top bar and bottom tabs have fixed heights.
-    #main gets everything else.
-  */
   display: flex; /* Side-by-side layout for sidebar and map */
-  position: relative; /* Required so absolute children (panels) are
-                          positioned relative to this div */
+  position: relative; /* Required so absolute children (panels) are positioned relative to this div */
   overflow: hidden; /* Clip anything that would stick out      */
   min-height: 0;
-  /*
-    min-height: 0 is a flexbox fix.
-    By default, flex children cannot shrink below their content height.
-    Without this, the main area would expand past the screen bottom
-    when the map content is tall.
-  */
 }
 
-/* ================================================================
-   5. SIDEBAR  (#sidebar)
-   ================================================================
-   A drawer that slides in from the left of the screen.
-   Position: "absolute" means it floats OVER the map.
-   On mobile:  slides in/out using CSS transform.
-   On desktop: always visible (transform removed in @media query).
-   ================================================================ */
+/* -------------------- SIDEBAR  -------------------*/
 #sidebar {
   width: var(--sidebar-width-sm); /* 280px on tablet */
   background: var(--bg-primary);

@@ -330,3 +330,65 @@ input:focus:not(:focus-visible) {
   font-size: 12px;
   color: var(--text-secondary);
 }
+
+/* -------------------------------main layout-------------------------------- */
+
+#main {
+  flex: 1;
+  display: flex; /* Side-by-side layout for sidebar and map */
+  position: relative; /* Required so absolute children (panels) are positioned relative to this div */
+  overflow: hidden; /* Clip anything that would stick out      */
+  min-height: 0;
+}
+
+/* -------------------- SIDEBAR  -------------------*/
+#sidebar {
+  width: var(--sidebar-width-sm); /* 280px on tablet */
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column; /* Stack header, items, footer top-to-bottom */
+  z-index: 700; /* Above the map (z-index 0) and controls (400) */
+  position: absolute; /* Float over the map, not push it aside       */
+  top: 0;
+  left: 0;
+  height: 100%;
+  transform: translateX(-100%);
+  /*
+    translateX(-100%) moves the sidebar 100% of ITS OWN WIDTH to the left.
+    This hides it off-screen. Since it is 280px wide, it moves -280px left.
+    The map fills the whole screen, and the sidebar is invisible.
+  */
+  transition: transform var(--speed) ease;
+  /* This makes the slide-in animation smooth instead of instant */
+  overflow-y: auto; /* If there are many sidebar items, allow scrolling */
+}
+
+/*
+  When JavaScript adds the class "open" to the sidebar,
+  this rule removes the transform and the sidebar slides into view.
+*/
+#sidebar.open {
+  transform: translateX(0); /* No offset — sidebar is fully visible */
+}
+
+/* ── DARK OVERLAY (#sidebar-overlay) ────────────────────────────── */
+/*
+  A semi-transparent black layer that appears behind the open sidebar
+  on mobile. It blocks interaction with the map until sidebar is closed.
+*/
+#sidebar-overlay {
+  display: none; /* Hidden by default */
+  position: absolute;
+  inset: 0;
+  /*
+    "inset: 0" is a shorthand for: top: 0; right: 0; bottom: 0; left: 0;
+    It stretches this element to cover the entire #main area.
+  */
+  background: rgba(0, 0, 0, 0.35); /* 35% transparent black */
+  z-index: 699; /* Just BELOW the sidebar (700) so the sidebar shows on top */
+}
+/* JavaScript adds "visible" class when the sidebar opens */
+#sidebar-overlay.visible {
+  display: block;
+}
