@@ -31,6 +31,12 @@
   </head>
 
   <body>
+
+    
+      <!--DARK OVERLAY (mobile only)-->
+      <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!--beginning of real code-->  
     <header id="top-bar">
       <!-- menu button -->
       <button id="menu-btn" title="Open menu" aria-label="Open menu">
@@ -92,43 +98,42 @@
     <div id="main">
       <!------------------LEFT SIDEBAR  (#sidebar)------------------------>
       <nav id="sidebar" aria-label="Main navigation">
-        <div id="sidebar-header">
-          <!-- Profile row: avatar circle + name + email -->
-          <div id="sidebar-profile">
-            <div id="avatar">U</div>
+        
+          <div id="sidebar-header">
+            <!-- Profile row: avatar circle + name + email -->
+            <div id="sidebar-profile">
+              <div id="avatar">U</div>
 
-            <div>
-              <div id="avatar-name">user_test</div>
-              <div id="avatar-email">transit@example.com</div>
+              <div>
+               <div id="avatar-name">user_test</div>
+               <div id="avatar-email">transit@example.com</div>
+             </div>
+            </div>
+
+            <!-- Close button — visible on mobile to dismiss the sidebar -->
+            <button id="sidebar-close" title="Close menu" aria-label="Close menu">
+             <i class="fa-solid fa-xmark"></i>
+           </button>
+
+        
+          </div>
+          <!-- end #sidebar-header -->
+      <div id="sidebar-content">
+          <!--SIDEBAR ITEMS-->
+
+          <!-- Section label — small uppercase grey text acting as a divider -->
+          <div class="sidebar-section-label">Navigation</div>
+
+          <!-- home placeholder -->
+          <div class="sidebar-item" onclick="goHome()">
+            <div class="sidebar-icon home-icon">
+              <i class="fa-solid fa-house"></i>
+            </div>
+            <div class="sidebar-text">
+              <span class="sidebar-title">Home</span>
             </div>
           </div>
-
-          <!-- Close button — visible on mobile to dismiss the sidebar -->
-          <button id="sidebar-close" title="Close menu" aria-label="Close menu">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-
-          <!-- settings button -->
-          <button id="settings-btn" title="Settings" aria-label="Settings">
-            <i class="fa-solid fa-gear"></i>
-          </button>
-        </div>
-        <!-- end #sidebar-header -->
-
-        <!--SIDEBAR ITEMS-->
-
-        <!-- Section label — small uppercase grey text acting as a divider -->
-        <div class="sidebar-section-label">Navigation</div>
-
-        <!-- home placeholder -->
-        <div class="sidebar-item" onclick="goHome()">
-          <div class="sidebar-icon home-icon">
-            <i class="fa-solid fa-house"></i>
-          </div>
-          <div class="sidebar-text">
-            <span class="sidebar-title">Home</span>
-          </div>
-        </div>
+        
 
         <!-- work placeholder -->
         <div class="sidebar-item" onclick="goWork()">
@@ -212,7 +217,7 @@
           </div>
         </div>
 
-        <div class="sidebar-section-label">Map</div>
+        <div class="sidebar-section-label">other</div>
 
         <!-- switch map style placeholder -->
         <div class="sidebar-item" onclick="switchLayer()">
@@ -249,14 +254,23 @@
           </div>
         </div>
 
+        <!-- settings button placeholder -->
+          <div class="sidebar-item" onclick="openSettings()">
+          <div class="sidebar-icon settings-icon">
+            <i class="fa-solid fa-gear"></i>
+          </div>
+          <div class="sidebar-text">
+            <span class="sidebar-title">Settings</span>
+          </div>
+        </div>
+
         <div id="sidebar-footer">
           <span>transit· personal Project</span>
+        </div>
         </div>
       </nav>
       <!------------------------ end #sidebar ------------------------------------>
 
-      <!--DARK OVERLAY (mobile only)-->
-      <div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
       <!-----------------------THE MAP--------------------------------------------->
       <div id="map" aria-label="Interactive map"></div>
