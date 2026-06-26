@@ -108,57 +108,7 @@ function switchLayer() {
   lat/lng = GPS coordinates (you can find these on Google Maps by right-clicking)
   type    = category, used to colour the marker
 */
-const landmarks = [
-  {
-    name: "USTHB University",
-    lat: 36.7122,
-    lng: 3.1622,
-    type: "university",
-    desc: "Université des Sciences et de la Technologie Houari-Boumediène",
-  },
-  {
-    name: "Grande Mosquée d'Alger",
-    lat: 36.7347,
-    lng: 3.0458,
-    type: "mosque",
-    desc: "One of the largest mosques in the world",
-  },
-  {
-    name: "Martyrs' Memorial",
-    lat: 36.7528,
-    lng: 3.057,
-    type: "monument",
-    desc: "Iconic monument dedicated to the Algerian revolution",
-  },
-  {
-    name: "Houari Boumediene Airport",
-    lat: 36.6932,
-    lng: 3.215,
-    type: "airport",
-    desc: "Main international airport serving Algiers",
-  },
-  {
-    name: "Casbah of Algiers",
-    lat: 36.7861,
-    lng: 3.0601,
-    type: "heritage",
-    desc: "UNESCO World Heritage Site — historic medina",
-  },
-  {
-    name: "Jardin d'Essai du Hamma",
-    lat: 36.7562,
-    lng: 3.0834,
-    type: "park",
-    desc: "Beautiful botanical garden established in 1832",
-  },
-  {
-    name: "Club des Pins Beach",
-    lat: 36.72,
-    lng: 2.99,
-    type: "beach",
-    desc: "Popular beach resort west of Algiers",
-  },
-];
+const landmarks = [];
 
 /*
   Marker icon colours per category.
@@ -837,33 +787,6 @@ document.addEventListener("fullscreenchange", function () {
   Leaflet gives us the map bounds.
   We calculate how many metres = 80 pixels, then display that.
 */
-function updateScaleBar() {
-  const mapSizeInPx = 80; /* width of our scale bar line */
-  const center = map.getCenter();
-  const zoom = map.getZoom();
-
-  /*
-    Formula: metres per pixel at a given latitude and zoom level.
-    156543 is the number of metres covered by 1 pixel at zoom 0 at the equator.
-    cos(lat) adjusts for the map projection stretching near the poles.
-  */
-  const metresPerPx =
-    (156543.03392 * Math.cos((center.lat * Math.PI) / 180)) / Math.pow(2, zoom);
-  const distance = metresPerPx * mapSizeInPx; /* metres covered by 80px */
-
-  let label;
-  if (distance >= 1000) {
-    label = (distance / 1000).toFixed(1) + " km";
-  } else {
-    label = Math.round(distance) + " m";
-  }
-
-  document.getElementById("scale-label").textContent = label;
-}
-
-/* Recalculate scale bar every time the map moves or zooms */
-map.on("moveend zoomend", updateScaleBar);
-updateScaleBar(); /* run once at startup */
 
 /* ════════════════════════════════════════════════════════════
    15. TOAST NOTIFICATION HELPER
@@ -955,3 +878,7 @@ function handleResize() {
 
 window.addEventListener("resize", handleResize);
 handleResize(); /* run once on page load */
+
+setTimeout(function () {
+  map.invalidateSize();
+}, 300);

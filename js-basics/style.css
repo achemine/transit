@@ -79,7 +79,7 @@ body {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px; /* Default text size for the whole app   */
   color: var(--text-primary); /* Near-black text everywhere by default */
-  background: var(--blue); /* Light grey page background       */
+  background: var(--bg-secondary);
   display: flex; /* Enable flexbox layout                 */
   flex-direction: column; /* Stack children top-to-bottom          */
 }
@@ -128,13 +128,21 @@ input:focus:not(:focus-visible) {
 #top-bar {
   display: flex; /* Lay children side by side                 */
   align-items: center; /* Vertically centre all children            */
-  gap: 10px; /* Space between hamburger, box, and buttons */
+  gap: 20px; /* Space between hamburger, box, and buttons */
   padding: 10px 14px; /* Inner spacing: 10px top/bottom, 14px left/right */
   height: var(--topbar-height); /* Fixed 64px height                  */
-  position: relative; /* Needed so the dropdown can be positioned
-                             relative to this bar (see #search-results) */
+  position: fixed; /* Needed so the dropdown can be positioned relative to this bar */
   z-index: 1000; /* Float above the map and sidebar           */
   flex-shrink: 0; /* Never let this bar shrink in height       */
+  background: rgba(255, 255, 255, 0.11); /* white but see-through */
+  backdrop-filter: blur(5px); /* frosted glass blur effect */
+  -webkit-backdrop-filter: blur(5px); /* same thing but for Safari/Opera */
+  border-radius: 30px; /* Round the corners of the bar */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%; /* or whatever width looks good */
+  max-width: 700px; /* stops it from getting too wide on large screens */
+  min-width: 300px; /* stops it from getting too narrow on small screens */
 }
 
 /* ── HAMBURGER MENU BUTTON (#menu-btn) ────────────────────────── */
@@ -532,3 +540,58 @@ input:focus:not(:focus-visible) {
   background: #fce8e6;
   color: var(--text-secondary);
 } /* Light red    */
+
+/* ── SIDEBAR TEXT COLUMN (.sidebar-text) ───────────────────────── */
+.sidebar-text {
+  display: flex;
+  flex-direction: column; /* Stack title above subtitle */
+  gap: 2px;
+}
+.sidebar-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+.sidebar-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── SIDEBAR FOOTER (last line in the sidebar) ──────────────────────────── */
+#sidebar-footer {
+  margin-top: auto;
+  padding: 16px;
+  font-size: 11px;
+  color: var(--text-hint);
+  border-top: 1px solid var(--bg-tertiary); /* Thin divider line above footer */
+  text-align: center;
+}
+
+/* ---------------------------the map-----------------------------------------------*/
+#map {
+  flex: 1; /* Fill all horizontal space not taken by the sidebar */
+  height: 100%; /* Fill the full height of #main                     */
+  position: absolute; /* Required so absolute children (panels) are positioned relative to this div */
+  inset: 0; /* Shorthand for top:0; right:0; bottom:0; left:0; */
+}
+
+/*
+  LEAFLET POPUP OVERRIDES
+  Leaflet draws popups with its own default styles.
+  We override them here to match our app's design.
+  "!important" forces our rule to win over Leaflet's own CSS.
+*/
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md) !important; /* Rounded corners */
+  box-shadow: var(--shadow-md) !important; /* Our depth shadow */
+  padding: 0 !important; /* We handle padding inside */
+}
+.leaflet-popup-content {
+  margin: 14px 16px !important;
+  font-family: "Roboto", Arial, sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+.leaflet-popup-tip {
+  background: var(--bg-primary) !important; /* White triangle tip */
+}
