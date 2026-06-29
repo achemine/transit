@@ -333,6 +333,45 @@
         <span id="layer-label">Default</span>
       </button>
 
+      <!-- ---------------------------PLACE INFO CARD------------------------------------------>
+  <div id="info-card" role="dialog" aria-label="Place information">
+    <!-- Close button — positioned at the top-right corner of the card -->
+    <button id="info-close" onclick="closeInfoCard()" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    <!-- Blue circle icon at the top of the card -->
+    <div id="info-icon">
+      <i class="fa-solid fa-location-dot"></i>
+    </div>
+
+    <!--PLACE NAME AND COORDINATES-->
+    <h3 id="info-title">Place Name</h3>
+    <p id="info-sub">Click on the map to see coordinates</p>
+
+    <!--LOCATION TAGS-->
+    <div id="info-tags">
+      <span class="tag">📍 Algiers</span>
+      <span class="tag">🗺️ Algeria</span>
+    </div>
+
+    <!--ACTION BUTTONS-->
+    <div class="card-actions">
+      <button class="card-btn primary" onclick="openDirections()">
+        <i class="fa-solid fa-diamond-turn-right"></i>
+        <span>Directions</span>
+      </button>
+      <button class="card-btn" onclick="saveCurrentPlace()">
+        <i class="fa-solid fa-star"></i>
+        <span>Save</span>
+      </button>
+      <button class="card-btn" onclick="shareLocation()">
+        <i class="fa-solid fa-share"></i>
+        <span>Share</span>
+      </button>
+    </div>
+  </div>
+  <!---------------------- end #info-card--------------------------------------->
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>

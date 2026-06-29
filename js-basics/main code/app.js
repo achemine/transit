@@ -1,3 +1,4 @@
+let clickedMarker = null;
 /*
   ══════════════════════════════════════════════════════════════
   app.js  —  My Maps App
@@ -182,6 +183,10 @@ let clickedLng = 3.0865;
 map.on("click", function (event) {
   clickedLat = event.latlng.lat;
   clickedLng = event.latlng.lng;
+  if (clickedMarker) map.removeLayer(clickedMarker);
+  clickedMarker = L.marker([clickedLat, clickedLng], {
+    icon: createIcon("#1a73e8"),
+  }).addTo(map);
   showInfoCard("Custom Location", clickedLat.toFixed(5), clickedLng.toFixed(5));
 });
 
@@ -194,13 +199,11 @@ function showInfoCard(name, lat, lng) {
 
 function closeInfoCard() {
   document.getElementById("info-card").classList.remove("open");
+  if (clickedMarker) {
+    map.removeLayer(clickedMarker);
+    clickedMarker = null;
+  }
 }
-
-/* Allow clicking outside the info card to close it */
-map.on("click", function () {
-  /* Small delay so the card doesn't close immediately when you click the map */
-  setTimeout(closeInfoCard, 150);
-});
 
 /* ════════════════════════════════════════════════════════════
    4. SEARCH  (Nominatim geocoding API — free, no key needed)
