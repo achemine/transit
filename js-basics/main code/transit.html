@@ -372,6 +372,73 @@
     </div>
   </div>
   <!---------------------- end #info-card--------------------------------------->
+<!----------------------------DIRECTIONS PANEL--------------------------------->
+<div id="directions-panel" role="dialog" aria-label="Directions">
+
+  <!-- Blue header with title and close button -->
+  <div id="directions-header">
+    <h3><i class="fa-solid fa-route"></i> Directions</h3>
+    <button onclick="closeDirections()" title="Close" aria-label="Close directions">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- TRANSPORT MODE BUTTONS -->
+  <div id="directions-modes">
+    <button class="mode-btn active" onclick="setDirectionMode(this, 'driving')" title="Driving">
+      <i class="fa-solid fa-car"></i>
+    </button>
+    <button class="mode-btn" onclick="setDirectionMode(this, 'cycling')" title="Cycling">
+      <i class="fa-solid fa-train"></i>
+    </button>
+    <button class="mode-btn" onclick="setDirectionMode(this, 'walking')" title="Walking">
+      <i class="fa-solid fa-person-walking"></i>
+    </button>
+  </div>
+
+  <!-- FROM / TO INPUTS -->
+  <div id="directions-inputs">
+
+    <!-- Visual connector column (dots and dashed line) -->
+    <div id="waypoint-dots">
+      <div class="dot blue-dot"></div>
+      <div class="dot-line"></div>
+      <div id="stop-dots"></div>  <!-- stop dots inserted here by JS -->
+      <div class="dot red-dot"></div>
+    </div>
+
+    <!-- Text input column -->
+    <div id="waypoint-fields">
+      <input type="text" id="from-input" placeholder="Starting point" />
+
+      <!-- Stop inputs are inserted here dynamically by JavaScript -->
+      <div id="stops-container"></div>
+
+      <input type="text" id="to-input" placeholder="Destination" />
+
+      <!-- Add stop button -->
+      <button id="add-stop-btn" onclick="addStop()">
+        <i class="fa-solid fa-plus"></i> Add stop
+      </button>
+    </div>
+
+  </div>
+  <!-- end #directions-inputs -->
+
+  <!-- GET ROUTE BUTTON -->
+  <button id="get-route-btn" onclick="getRoute()">
+    <i class="fa-solid fa-diamond-turn-right"></i> Get Route
+  </button>
+
+  <!--
+    ROUTE SUMMARY
+    Empty to start. After the route is drawn, JavaScript inserts
+    text like: "12.4 km  ·  18 min"
+  -->
+  <div id="route-summary"></div>
+
+</div>
+<!-- end #directions-panel -->
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>

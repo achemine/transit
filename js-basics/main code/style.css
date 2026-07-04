@@ -50,7 +50,7 @@
   --topbar-height: 64px; /* Height of the search bar at the top     */
   --bottombar-height: 58px; /* Height of the transport tabs at bottom  */
   --sidebar-width: 340px; /* Sidebar width on desktop screens        */
-  --sidebar-width-sm: 420px; /* Sidebar width on tablet screens         */
+  --sidebar-width-sm: 260px; /* Sidebar width on tablet screens         */
 
   /* ── ANIMATION SPEED ────────────────────────────────────────── */
   --speed: 0.25s; /* 0.25 seconds — quick but smooth                   */
@@ -787,4 +787,265 @@ input:focus:not(:focus-visible) {
 }
 .card-btn.primary:hover {
   background: var(--blue-dark);
+}
+
+/* ════════════════════════════════════════════════════════════
+   DIRECTIONS PANEL
+   ════════════════════════════════════════════════════════════ */
+#directions-panel {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 300px;
+  z-index: 600;
+  display: none; /* hidden until user clicks Directions */
+  overflow: hidden;
+}
+
+/* ── Blue header bar ── */
+#directions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 12px;
+  background: var(--blue);
+  color: white;
+}
+#directions-header h3 {
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#directions-header button {
+  color: white;
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background var(--speed);
+}
+#directions-header button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Transport mode buttons ── */
+#directions-modes {
+  display: flex;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+.mode-btn {
+  flex: 1;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  font-size: 17px;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  transition:
+    background var(--speed),
+    color var(--speed);
+}
+.mode-btn:hover {
+  background: var(--blue-light);
+  color: var(--blue);
+}
+.mode-btn.active {
+  background: var(--blue);
+  color: white;
+}
+
+/* ── From / To inputs with connector dots ── */
+#directions-inputs {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  padding: 16px;
+}
+
+/* Left column: the dots and dashed line connector */
+#waypoint-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+}
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.blue-dot {
+  background: var(--blue);
+}
+.red-dot {
+  background: var(--red);
+}
+.dot-line {
+  flex: 1;
+  width: 2px;
+  min-height: 20px;
+  margin: 4px 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border) 0px,
+    var(--border) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* Stop dots container — JS adds dot-lines here for each stop */
+#stop-dots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.stop-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange);
+  flex-shrink: 0;
+  margin: 4px 0;
+}
+.stop-dot-line {
+  width: 2px;
+  min-height: 20px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--border) 0px,
+    var(--border) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+/* Right column: all the input fields */
+#waypoint-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#waypoint-fields input,
+.stop-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  transition:
+    border-color var(--speed),
+    background var(--speed);
+}
+#waypoint-fields input:focus,
+.stop-input:focus {
+  border-color: var(--blue);
+  background: var(--bg-primary);
+  outline: none;
+}
+#waypoint-fields input::placeholder,
+.stop-input::placeholder {
+  color: var(--text-hint);
+}
+
+/* ── Stop row (input + remove button side by side) ── */
+.stop-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stop-row .stop-input {
+  flex: 1;
+}
+
+/* ── Remove stop button (× next to each stop) ── */
+.remove-stop-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition:
+    background var(--speed),
+    color var(--speed);
+}
+.remove-stop-btn:hover {
+  background: #fce8e6;
+  color: var(--red);
+}
+
+/* ── Add stop button ── */
+#add-stop-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue);
+  background: var(--blue-light);
+  border: 1.5px solid var(--blue);
+  border-radius: var(--radius-pill);
+  transition:
+    background var(--speed),
+    color var(--speed);
+  align-self: flex-start; /* don't stretch full width */
+}
+#add-stop-btn:hover {
+  background: var(--blue);
+  color: white;
+}
+
+/* ── Get Route button ── */
+#get-route-btn {
+  margin: 0 16px 16px;
+  width: calc(100% - 32px);
+  padding: 12px;
+  background: var(--blue);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background var(--speed),
+    transform var(--speed);
+}
+#get-route-btn:hover {
+  background: var(--blue-dark);
+}
+#get-route-btn:active {
+  transform: scale(0.98);
+}
+
+/* ── Route summary (distance + time) ── */
+#route-summary {
+  padding: 0 16px 16px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 16px;
+}
+#route-summary span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
