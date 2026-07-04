@@ -49,7 +49,7 @@
   /* ── LAYOUT SIZES ───────────────────────────────────────────── */
   --topbar-height: 64px; /* Height of the search bar at the top     */
   --bottombar-height: 58px; /* Height of the transport tabs at bottom  */
-  --sidebar-width: 340px; /* Sidebar width on desktop screens        */
+  --sidebar-width: 240px; /* Sidebar width on desktop screens        */
   --sidebar-width-sm: 260px; /* Sidebar width on tablet screens         */
 
   /* ── ANIMATION SPEED ────────────────────────────────────────── */
